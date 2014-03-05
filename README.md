@@ -88,6 +88,7 @@ nnoremap <A-S-q>  :BetterSearchCloseWin<CR>
 ```
 mkdir -p ~/.vim/bundle
 cd ~/.vim/bundle
+git clone https://github.com/kenng/vim-bettersearch.git
 ```
 
 ### The OLD way

@@ -12,7 +12,13 @@
 "              obligation to maintain or extend this software. It is provided on an
 "              "as is" basis without any expressed or implied warranty.
 " ============================================================================
-let s:betterSearch_version = '0.0.5'
+let s:betterSearch_version = '0.0.6'
+
+" todo: consider to use vimgrep and getqflist() to compare the performance of
+" using global to search for the result.
+"
+" note: append(line, list) takes in list, unless the search content is formatted
+" into a list, the put! is preferred in this way
 
 " initialization {{{
 
@@ -33,8 +39,8 @@ let s:content_window_path = ""
 let s:isHighlightOn = 1
 let s:isCopyToClipboard = 0
 let s:search_token_copy = []
-let s:pattern_name = ['String', 'Number', 'Function', 'Keyword', 'Directory',
-                     \'Type', 'rubyRegexpDelimiter', 'PmenuSel', 'MatchParen',
+let s:pattern_name = ['PmenuSel', 'Number', 'Function', 'Keyword', 'Directory',
+                     \'Type', 'rubyRegexpDelimiter', 'String', 'MatchParen',
                      \'rubyStringDelimiter', 'javaDocSeeTag']
 " content window and search window mapping, for the use of switching between
 " window
@@ -96,13 +102,21 @@ endfunction
 
 function s:GoToLine()
     let isMagic = &magic
-    set nomagic
+    set magic
     let str = getline(".")
-    let str = substitute(str, '\$', '\\\$', "g")
+    let str = escape(str, '/$\*')
+    let str = substitute(str, "[[:space:]]\\+", "[[:space:]]\\\\{1,}", "g")
     call s:SwitchBetweenWin()
-    exe "silent /".str
-    if (isMagic)
-        set magic
+    "let s:oldSearch = @/
+    "keeppatterns exe "silent /".str
+    "let @/ = s:oldSearch
+    let line = search(str)
+    if 0 == line
+        echom "search not found: ". str
+        let @/=str
+    endif
+    if (!isMagic)
+        set nomagic
     endif
 endfunction
 
@@ -175,8 +189,10 @@ function s:displayHelp()
         \ . ""
     let l:help_text = l:help_text
         \ . "--- [ highlight ] syntax --- \n" . l:pattern_name_text
+    let s:oldContent = @g
     let @g = l:help_text
     exe "1put! g"
+    let @g = s:oldContent
     if s:isHighlightOn
         execute 'syn match BetterSearch #:BetterSearch\w\+#'
         execute "hi link BetterSearch String"
@@ -258,8 +274,14 @@ function s:BetterSearch(...)
 		let str=expand("<cword>")
 	endif
 
+    " save the user expandtab value, then set to noexpandtab for search.
+    " This is to prevent the case like original doc is tab-based,
+    " while user setting is expandtab to space. This causes the 
+    " GoToLine not able to find the corresponding match due to 
+    " mismatch in space.
     let s:content_window_path = expand("%:p")
 	" clear register g
+    let s:oldContent = @g
 	let @g="\"  Press ". g:BetterSearchMapHelp ." for help\n\n"
     let @g=@g."content path : ". s:content_window_path. "\n"
 	let @g=@g."search term: \n". ori_str."\n\n"
@@ -287,6 +309,7 @@ function s:BetterSearch(...)
     endif
     " paste the content of register g before line 1
     exe "1put! g"
+    let @g=s:oldContent
     " ---- syntax highlight ----
     call s:BetterSearchSyntaxHighlight(l:search_token)
     let s:search_token_copy = copy(l:search_token)
@@ -314,6 +337,11 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " History of changes:
+"
+" [ version ] 0.0.6 ( 02 Mar 2014 )
+"   - escape characters which will cause gotoLine() not able to match string
+"   - use search() instead of global / in gotoLine()
+"
 " [ version ] 0.0.5 ( 02 Mar 2014 )
 "   - enable [Enter] to jump to particular line without line number switched on
 
