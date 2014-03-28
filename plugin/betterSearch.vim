@@ -12,7 +12,7 @@
 "              obligation to maintain or extend this software. It is provided on an
 "              "as is" basis without any expressed or implied warranty.
 " ============================================================================
-let s:betterSearch_version = '0.0.6'
+let s:betterSearch_version = '0.0.7'
 
 " todo: consider to use vimgrep and getqflist() to compare the performance of
 " using global to search for the result.
@@ -104,13 +104,12 @@ function s:GoToLine()
     let isMagic = &magic
     set magic
     let str = getline(".")
-    let str = escape(str, '/$\*')
-    let str = substitute(str, "[[:space:]]\\+", "[[:space:]]\\\\{1,}", "g")
     call s:SwitchBetweenWin()
     "let s:oldSearch = @/
     "keeppatterns exe "silent /".str
     "let @/ = s:oldSearch
-    let line = search(str)
+    "using \V very nomagic
+    let line = search('\V'.str)
     if 0 == line
         echom "search not found: ". str
         let @/=str
@@ -282,6 +281,8 @@ function s:BetterSearch(...)
     let s:content_window_path = expand("%:p")
 	" clear register g
     let s:oldContent = @g
+    let s:oldnumber = &number
+    set nonumber
 	let @g="\"  Press ". g:BetterSearchMapHelp ." for help\n\n"
     let @g=@g."content path : ". s:content_window_path. "\n"
 	let @g=@g."search term: \n". ori_str."\n\n"
@@ -289,6 +290,7 @@ function s:BetterSearch(...)
 	silent exe "redir @g>>"
 	silent exe "g /". str
 	silent exe "redir END"
+    let &number=s:oldnumber
     if ( list_len == 2)
         call cursor(a:2, 1)
     else
@@ -337,6 +339,10 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " History of changes:
+"
+" [ version ] 0.0.7 ( 02 Mar 2014 )
+"   - fixed bug not able to jump to line when line number is switched on
+"   - fixed bug not able to jump to line which contains certain regexp
 "
 " [ version ] 0.0.6 ( 02 Mar 2014 )
 "   - escape characters which will cause gotoLine() not able to match string
