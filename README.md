@@ -83,7 +83,7 @@ nnoremap <A-S-q>  :BetterSearchCloseWin<CR>
 
 ## Installation
 
-### Using Pathogon
+### Using Pathogen
 
 ```
 mkdir -p ~/.vim/bundle
