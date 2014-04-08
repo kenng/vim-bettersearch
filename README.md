@@ -24,7 +24,7 @@ course this is much better as it is in vim!
 - Search term highlight can be switched on and off
 - Search keyword can be saved to clipboard
 
-![demo](https://lh4.googleusercontent.com/-n0t1bG6Kg9c/Urdxwq-ETpI/AAAAAAAAERU/p14VNH7APNk/w943-h597-no/Screenshot+from+2013-12-23+07%253A06%253A58.png)
+![demo](https://lh3.googleusercontent.com/-59ToPH9nCLE/U0PcuuIc5yI/AAAAAAAAEeQ/n9rWXnTyg-o/w955-h597-no/Screenshot+from+2014-04-08+19%253A14%253A23.png)
 
 ## Example Usage
 There are a few way to use the function of this script.
@@ -69,6 +69,18 @@ the search window)
 ':BetterSearchHighlighToggle'   - to toggle keyword highlight on off (default is on)
 ':BetterSearchHighlightLimit'   - to toggle line limit to switch off keyword highlight, for efficiency purpose, especially for large matched, default is 5000 line
 ':BetterSearchCopyToClipBoard'  - to toggle whether to save to the search words to clipboard, default is off
+```
+
+## HightLight Configuration
+By default, this plugin can highlight up to 11 terms. For example, to use 
+different highlight color for first and second search term
+```
+:BetterSearchChangeHighlight 0 Directory
+:BetterSearchChangeHighlight 0 ModeMsg
+```
+The highlight color name can be obtained by running
+```
+:highlight
 ```
 
 ## Mapping

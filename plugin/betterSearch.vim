@@ -282,8 +282,8 @@ function s:BetterSearch(...)
 	let @g="\"  Press ". g:BetterSearchMapHelp ." for help\n\n"
     let @g=@g."content path : ". s:content_window_path. "\n"
 	let @g=@g."search term: \n". ori_str."\n\n"
-    let @g=@g."================================================================================"
-    let @g=@g."Line                         Result"
+    let @g=@g."================================================================================\n"
+    let @g=@g."Line                         Result\n"
     let @g=@g."================================================================================"
 	" redirect global search output to register g
 	silent exe "redir @g>>"
