@@ -101,21 +101,10 @@ function s:SwitchBetweenWin()
 endfunction
 
 function s:GoToLine()
-    let isMagic = &magic
-    set magic
-    let str = getline(".")
-    call s:SwitchBetweenWin()
-    "let s:oldSearch = @/
-    "keeppatterns exe "silent /".str
-    "let @/ = s:oldSearch
-    "using \V very nomagic
-    let line = search('\V'.str)
-    if 0 == line
-        echom "search not found: ". str
-        let @/=str
-    endif
-    if (!isMagic)
-        set nomagic
+    let lineNum = matchstr(getline("."), '^ *[[:digit:]]\+')
+    if lineNum != ""
+        call s:SwitchBetweenWin()
+        exe ":".lineNum
     endif
 endfunction
 
@@ -172,6 +161,7 @@ function s:displayHelp()
         \ . "    :BetterSearchChangeHighlight 0 Directory \n"
         \ . "  - e.g to change the highlight of second search term to 'Keyword' highlight\n"
         \ . "    :BetterSearchChangeHighlight 1 Keyword \n"
+        \ . "  - default maximum definable highlight is 11 (That's really more than enough! ;)"
         \ . "':BetterSearchCloseWin' \n"
         \ . "  - to close the betterSearch window\n"
         \ . "\n\n"
@@ -218,11 +208,17 @@ endfunction
 function s:BetterSearchSyntaxHighlight(search_token)
     execute "syn match helpText #Press ". g:BetterSearchMapHelp ." for help#"
     execute "hi link helpText Comment"
+    execute "syn match line_number #^ *[0-9]\* #"
+    execute "hi link line_number LineNr"
+
     let l:index = 0
+    " --- if total line of search result is less than g:BetterSearchTotalLine
     if s:isHighlightOn && (line('$') < g:BetterSearchTotalLine)
         echo "search highlight on"
         while index < len(a:search_token)
+            " --- if total search_token is less than what we can color
             if (index < len(s:pattern_name))
+                " --- define highlight pattern, e.g. syn match search_word[n] <pattern>
                 execute "syn match search_word".index. " #". a:search_token[index] ."#"
                 execute "hi link search_word".index. " ".s:pattern_name[index]
                 let l:index = l:index + 1
@@ -282,10 +278,13 @@ function s:BetterSearch(...)
 	" clear register g
     let s:oldContent = @g
     let s:oldnumber = &number
-    set nonumber
+    set number
 	let @g="\"  Press ". g:BetterSearchMapHelp ." for help\n\n"
     let @g=@g."content path : ". s:content_window_path. "\n"
 	let @g=@g."search term: \n". ori_str."\n\n"
+    let @g=@g."================================================================================"
+    let @g=@g."Line                         Result"
+    let @g=@g."================================================================================"
 	" redirect global search output to register g
 	silent exe "redir @g>>"
 	silent exe "g /". str
@@ -303,6 +302,7 @@ function s:BetterSearch(...)
         setlocal bufhidden=wipe
         setlocal noswapfile
         setlocal nobuflisted
+        setlocal nonumber
         call s:BetterSearchBindMapping()
         let s:bettersearch_window_nr = bufnr("")
         let s:win_mapping[s:content_window_nr]=s:bettersearch_window_nr
@@ -340,7 +340,11 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " History of changes:
 "
-" [ version ] 0.0.7 ( 02 Mar 2014 )
+" [ version ] 0.0.8 ( 8 Apr 2014 )
+"   - revert function gotoLine() as it is easy and accurate
+"   - added highlight for line number in the result
+"
+" [ version ] 0.0.7 ( 29 Mar 2014 )
 "   - fixed bug not able to jump to line when line number is switched on
 "   - fixed bug not able to jump to line which contains certain regexp
 "
