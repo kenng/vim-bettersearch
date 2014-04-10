@@ -93,6 +93,12 @@ nnoremap <A-w>    :BetterSearchSwitchWin<CR>
 nnoremap <A-S-q>  :BetterSearchCloseWin<CR>
 ```
 
+## Miscellaneous Notes
+Case sensitivity of search will be same as system ignorecase option (check with :set ic?)
+
+However highlight is always case sensitive, so if you set ignorecase, search result will not highlight terms with unmatched case. 
+
+
 ## Installation
 
 ### Using Pathogen
