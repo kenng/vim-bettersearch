@@ -75,10 +75,13 @@ the search window)
 By default, this plugin can highlight up to 11 terms. For example, to use 
 different highlight color for first and second search term
 ```
-:BetterSearchChangeHighlight 0 Directory
-:BetterSearchChangeHighlight 0 ModeMsg
+:let g:BetterSearchhighlight[0] = 'Directory'
+:let g:BetterSearchhighlight[1] = 'BetterSearchHighlight10'
 ```
-The highlight color name can be obtained by running
+This plugin has a list of custom highlight definitions with the name of: 
+BetterSearchHighlight0, BetterSearchHighlight1, ..., BetterSearchHighlight10
+
+The internal vim highlight color name can be obtained by running
 ```
 :highlight
 ```
@@ -92,12 +95,6 @@ vnoremap <A-S-F7> :BetterSearchVisualSelect<CR>
 nnoremap <A-w>    :BetterSearchSwitchWin<CR>
 nnoremap <A-S-q>  :BetterSearchCloseWin<CR>
 ```
-
-## Miscellaneous Notes
-Case sensitivity of search will be same as system ignorecase option (check with :set ic?)
-
-However highlight is always case sensitive, so if you set ignorecase, search result will not highlight terms with unmatched case. 
-
 
 ## Installation
 
